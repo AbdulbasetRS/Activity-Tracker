@@ -1,5 +1,7 @@
 # Activity Tracker for Laravel
 
+![Thumbnail](media/thumbnail.png)
+
 Activity Tracker is a comprehensive logging package for Laravel projects, designed to track various activities within your application. It provides functionality to log events such as entity creation, updates, deletions, and retrievals, along with additional contextual information like user ID, IP address, device type, and more.
 
 ## Table of Contents
