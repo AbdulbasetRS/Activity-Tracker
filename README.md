@@ -42,6 +42,14 @@ php artisan vendor:publish --provider="Abdulbaset\ActivityTracker\Providers\Acti
 
 This will create a `config/activity-tracker.php` file where you can configure various aspects of the package.
 
+## Migrations
+
+After installing the package, you need to run the migrations to create the required database tables. To do this, use the following Artisan command:
+
+```bash
+php artisan migrate --path=vendor/abdulbaset/activity-tracker/src/database/migrations
+```
+
 ## Basic Usage
 
 ### Manual Logging
