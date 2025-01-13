@@ -3,46 +3,61 @@
 namespace Abdulbaset\ActivityTracker\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Abdulbaset\ActivityTracker\Services\ActivityLogger;
 use Abdulbaset\ActivityTracker\ActivityTracker;
-use Illuminate\Auth\Events\Login;
-use Illuminate\Auth\Events\Failed;
-use Illuminate\Auth\Events\Logout;
-use Illuminate\Support\Facades\Event;
-use Abdulbaset\ActivityTracker\Listeners\LogLoginActivityListener;
-use Abdulbaset\ActivityTracker\Listeners\LogLoginFailedActivityListener;
-use Abdulbaset\ActivityTracker\Listeners\LogLogoutActivityListener;
+use Illuminate\Contracts\Http\Kernel;
 
+/**
+ * Class ActivityTrackerServiceProvider
+ *
+ * This service provider class is used to register the ActivityTracker service with Laravel's service container.
+ * It also registers the ActivityTrackerExceptionHandler as the exception handler for the application.
+ *
+ * @link https://github.com/AbdulbasetRS/Activity-Tracker Link to the GitHub repository for more details.
+ * @link https://www.linkedin.com/in/abdulbaset-r-sayed Link to my LinkedIn profile for professional inquiries.
+ * @author Abdulbaset R. Sayed
+ * @license MIT License
+ * @package Abdulbaset\ActivityTracker\Facades
+ */
 class ActivityTrackerServiceProvider extends ServiceProvider
 {
-    public function boot()
-    {
-        // Register login event listener if enabled in config
-        if (config('activity-tracker.log_login_auth')) {
-            Event::listen(Login::class, LogLoginActivityListener::class);
-            Event::listen(Failed::class, LogLoginFailedActivityListener::class);
-        }
-        
-        // Register logout event listener if enabled in config
-        if (config('activity-tracker.log_logout_auth')) {
-            Event::listen(Logout::class, LogLogoutActivityListener::class);
-        }
-
-        // Publish config file
-        $this->publishes([
-            __DIR__.'/../Config/activity-tracker.php' => config_path('activity-tracker.php'),
-        ]);
-
-        // Load migrations
-        $this->loadMigrationsFrom(__DIR__.'/../Migrations');
-    }
-
     public function register()
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../Config/activity-tracker.php', 'activity-tracker'
+        $this->app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \Abdulbaset\ActivityTracker\Handlers\ActivityTrackerExceptionHandler::class
         );
-        $this->app->singleton('activity-tracker', function ($app) {
-            return new ActivityTracker();
-        });
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/activity-tracker.php',
+            'activity-tracker'
+        );
+
+        $this->app->singleton(ActivityTracker::class, function ($app) {
+            return new ActivityTracker(
+                $app->make(ActivityLogger::class),
+            );
+        }); 
+    }
+
+    public function boot(Kernel $kernel)
+    {
+        
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/activity-tracker.php' => config_path('activity-tracker.php'),
+            ], 'config');
+        }
+        
+        $this->registerEventSubscribers();
+        $kernel->pushMiddleware(\Abdulbaset\ActivityTracker\Middleware\LogRouteAccessMiddleware::class);
+
+    }
+
+    protected function registerEventSubscribers()
+    {
+        $this->app['events']->subscribe(\Abdulbaset\ActivityTracker\Subscribers\AuthEventSubscriber::class);
+        $this->app['events']->subscribe(\Abdulbaset\ActivityTracker\Subscribers\QueryEventSubscriber::class);
     }
 }

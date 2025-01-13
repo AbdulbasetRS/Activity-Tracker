@@ -3,7 +3,7 @@
     "description": "A comprehensive activity Tracker for Laravel projects.",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "authors": [
         {
             "name": "Abdulbaset R. Sayed",
@@ -13,15 +13,14 @@
     "homepage": "https://digitalatum.com",
     "require": {
         "php": "^7.4|^8.0",
-        "illuminate/support": "^8.0|^9.0|^10.0"
+        "illuminate/support": "^8.0|^9.0|^10.0",
+        "laravel/framework": "^9.0|^10.0",
+        "jenssegers/agent": "^2.6"
     },
     "autoload": {
         "psr-4": {
             "Abdulbaset\\ActivityTracker\\": "src/"
-        },
-        "files": [
-            "src/Helpers/ActivityTrackerHelper.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -50,6 +49,5 @@
         "events",
         "tracking",
         "audit trail"
-    ],
-    "minimum-stability": "dev"
+    ]
 }

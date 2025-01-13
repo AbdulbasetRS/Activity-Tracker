@@ -1,91 +1,87 @@
 <?php
 
-// config/activity-tracker.php
-
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | Activity Tracker Enabled
-    |--------------------------------------------------------------------------
-    |
-    | This value determines whether the activity tracker is enabled or disabled.
-    | If set to true, activity logging will be enabled. If set to false, activity
-    | logging will be disabled and no logs will be recorded.
-    |
-    */
     'enabled' => env('ACTIVITY_TRACKER_ENABLED', true),
+    
+    'log_method' => env('ACTIVITY_TRACKER_LOG_METHOD', 'file'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Activity Log Table Name
-    |--------------------------------------------------------------------------
-    |
-    | This value determines the name of the table that will store the activity
-    | logs if the 'database' logging method is used. You can set this to any
-    | table name that fits your application's requirements.
-    |
-    */
-    'table_name' => 'activities',
+    'log_file_path' => env('ACTIVITY_TRACKER_LOG_FILE_PATH', storage_path('logs/activity_tracker.log')),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Logging Method
-    |--------------------------------------------------------------------------
-    |
-    | This value determines where the activity logs will be stored. You can
-    | choose between 'database' and 'file'. If 'database' is selected, logs
-    | will be stored in the table specified above. If 'file' is selected,
-    | logs will be stored in the file specified by 'log_file_path'.
-    |
-    | Supported options: 'database', 'file'
-    |
-    */
-    'log_method' => 'database',
+    'database' => [
+        'connection' => env('ACTIVITY_TRACKER_DB_CONNECTION', env('DB_CONNECTION', 'mysql')),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Log File Path
-    |--------------------------------------------------------------------------
-    |
-    | This value specifies the path to the file where activity logs will be
-    | stored if the 'file' logging method is used. The path should be an
-    | absolute path or a relative path from the storage directory.
-    |
-    */
-    'log_file_path' => storage_path('logs/activities.log'),
+        'table' => env('ACTIVITY_TRACKER_TABLE', 'activities'),
+    ],
+    
+    'tracking' => [
+        'auth' => [
+            'enabled' => true,
+            'events' => [
+                'login' => true,
+                'logout' => true,
+                'failed' => true,
+                'lockout' => true,
+                'registered' => true,
+                'verified' => true,
+                'password_reset' => true,
+            ],
+        ],
+        'models' => [
+            'enabled' => true,
+            'events' => [
+                'creating' => true,
+                'created' => true,
+                'updating' => true,
+                'updated' => true,
+                'deleting' => true,
+                'deleted' => true,
+                'force_deleting' => true,
+                'force_deleted' => true,
+                'restoring' => true,
+                'restored' => true,
+            ],
+            'full_model_data' => false,
+        ],
+        'exceptions' => [
+            'enabled' => true,
+            'events' => [
+                'not_found' => true,
+                'unauthorized' => true,
+                'method_not_allowed' => true,
+                'too_many_requests' => true,
+                'conflict' => true,
+                'unprocessable_entity' => true,
+                'access_denied' => true,
+                'gone' => true,
+                'precondition_failed' => true,
+                'unsupported_media_type' => true,
+                'general' => true,
+            ],
+            'include_trace' => false,
+        ],
+        'routes' => true,
+        'queries' => false,
+    ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Log Only Changes
-    |--------------------------------------------------------------------------
-    |
-    | This value determines whether only the changes should be logged when an
-    | entity is updated.
-    |
-    */
-    'log_only_changes' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Log Login Auth
-    |--------------------------------------------------------------------------
-    |
-    | This option determines whether login events will be automatically logged.
-    | If set to true, login events will be logged. This includes both successful
-    | and failed login attempts. If set to false, login events will not be logged.
-    |
-    */
-    'log_login_auth' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Log Logout Auth
-    |--------------------------------------------------------------------------
-    |
-    | This option determines whether logout events will be automatically logged.
-    | If set to true, logout events will be logged. If set to false, logout events
-    | will not be logged.
-    |
-    */
-    'log_logout_auth' => true,
+    'exclude' => [
+        'routes' => [
+            'horizon*',
+            'nova*',
+            '_debugbar*',
+        ],
+        'models' => [],
+        'model_attributes' => [
+            'password',
+            'remember_token',
+            'api_token',
+            'auth_token',
+            'access_token',
+            'refresh_token',
+            'token',
+            'secret',
+            'password_confirmation',
+            'current_password',
+            'new_password',
+        ],
+    ],
 ];
